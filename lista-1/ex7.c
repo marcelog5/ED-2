@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct Fila
 {
@@ -7,52 +8,38 @@ typedef struct Fila
     struct Fila *proximo;
 } Fila;
 
-char ultima_letra(char linha[])
+typedef struct Dados
 {
-    int i = 0;
+    struct Fila *calda;
+} Dados;
 
-    while (linha[i] != '\0')
-    {
-        i++;
-    }
-
-    return linha[--i];
-}
-
-void enfileira(char linha[],Fila *fila)
+void enfileira(char linha[], Fila *fila, Dados *dados)
 {
     Fila *aux, *novo;
 
     novo = (Fila *)malloc(sizeof(Fila));
     novo->proximo = NULL;
-    int i = 0;
-    while (linha[i] != '\0')
-    {
-        novo->cidade[i] = linha[i];
-        i++;
-    }
-    novo->cidade[i] = '\0';
+    strcpy(novo->cidade, linha);
 
-    aux = fila;
-    while (aux->proximo != NULL)
-    {
-        aux = aux->proximo;
-    }
-    aux->proximo = novo;
+    dados->calda->proximo = novo;
+    dados->calda = novo;
 }
 
 int main(int argc, char const *argv[])
 {
     char linha[26];
-    Fila *fila, *aux, *novo;
+    Dados dados;
+    Fila *fila, *aux;
 
     fila = (Fila *)malloc(sizeof(Fila));
     scanf("%s", fila->cidade);
     fila->proximo = NULL;
 
-    while ((scanf("%s", linha)) == 1)
+    dados.calda = fila;
+
+    while (scanf("%s", linha) == 1)
     {
-        enfileira(linha,fila);
+        enfileira(linha, fila, &dados);
     }
 
     aux = fila;
@@ -60,13 +47,13 @@ int main(int argc, char const *argv[])
     while (fila->proximo != NULL)
     {
         aux = fila;
-        if (ultima_letra(fila->cidade) == (fila->proximo->cidade[0] + 32))
+        if (fila->cidade[strlen(fila->cidade) - 1] == (fila->proximo->cidade[0] + 32))
         {
             printf("%s\n", fila->cidade);
             fila = fila->proximo;
             free(aux);
 
-            enfileira(fila->cidade,fila);
+            enfileira(fila->cidade, fila, &dados);
             aux = fila;
             fila = fila->proximo;
             free(aux);
